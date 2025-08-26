@@ -112,7 +112,7 @@ const Profile = () => {
               <div className='flex flex-col gap-1'>
                 <span className='font-semibold'>{userProfile?.bio || 'bio here...'}</span>
                 <Badge className='w-fit' variant='secondary'><AtSign /> <span className='pl-1'>{userProfile?.username}</span> </Badge>
-                <span>I am jitu</span>
+                {/* <span>I am jitu</span> */}
               </div>
             </div>
           </section>
