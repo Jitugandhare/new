@@ -228,8 +228,6 @@ export const getSuggestedUsers = async (req, res) => {
 };
 
 // Follow or Unfollow
-
-
 export const followOrUnfollow = async (req, res) => {
     try {
         const currentUserId = mongoose.Types.ObjectId(req.id);
@@ -252,7 +250,9 @@ export const followOrUnfollow = async (req, res) => {
             });
         }
 
-        const isFollowing = currentUser.following.includes(targetUserId);
+        const isFollowing = currentUser.following.some(
+            (id) => id.toString() === targetUserId.toString()
+        );
 
         if (isFollowing) {
             await Promise.all([
@@ -288,11 +288,13 @@ export const followOrUnfollow = async (req, res) => {
             });
         }
     } catch (error) {
-        console.error(error);
+        console.error("Follow/unfollow error:", error);
         return res.status(500).json({
             message: "Internal server error",
             success: false,
         });
     }
 };
+
+
 
