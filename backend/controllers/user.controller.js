@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
@@ -227,12 +228,14 @@ export const getSuggestedUsers = async (req, res) => {
 };
 
 // Follow or Unfollow
+
+
 export const followOrUnfollow = async (req, res) => {
     try {
-        const currentUserId = req.id;
-        const targetUserId = req.params.id;
+        const currentUserId = mongoose.Types.ObjectId(req.id);
+        const targetUserId = mongoose.Types.ObjectId(req.params.id);
 
-        if (currentUserId === targetUserId) {
+        if (currentUserId.equals(targetUserId)) {
             return res.status(400).json({
                 message: "You cannot follow/unfollow yourself.",
                 success: false,
@@ -292,3 +295,4 @@ export const followOrUnfollow = async (req, res) => {
         });
     }
 };
+
