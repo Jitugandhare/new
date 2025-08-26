@@ -9,7 +9,7 @@ import { Post } from "../models/post.model.js";
 const SALT_ROUNDS = 10;
 const JWT_EXPIRES_IN = "1d";
 
-// Register
+
 export const register = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -29,7 +29,15 @@ export const register = async (req, res) => {
             });
         }
 
-        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        const usernameExists = await User.findOne({ username });
+        if (usernameExists) {
+            return res.status(400).json({
+                message: "Username already taken. Try another one.",
+                success: false,
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
         await User.create({ username, email, password: hashedPassword });
 
         return res.status(201).json({
@@ -44,6 +52,7 @@ export const register = async (req, res) => {
         });
     }
 };
+
 
 // Login
 export const login = async (req, res) => {

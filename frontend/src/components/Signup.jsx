@@ -14,52 +14,59 @@ const Signup = () => {
         password: ""
     });
     const [loading, setLoading] = useState(false);
-    const {user} = useSelector(store=>store.auth);
+    const { user } = useSelector(store => store.auth);
     const navigate = useNavigate();
 
     const changeEventHandler = (e) => {
-        setInput({ ...input, [e.target.name]: e.target.value });
-    }
+        const { name, value } = e.target;
+        setInput(prev => ({ ...prev, [name]: value }));
+    };
 
     const signupHandler = async (e) => {
         e.preventDefault();
+
+        const { username, email, password } = input;
+
+        if (!username || !email || !password) {
+            return toast.error("All fields are required!");
+        }
+
         try {
             setLoading(true);
-            const res = await axios.post('https://new-jfuz.onrender.com/api/v1/user/register', input, {
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                withCredentials: true
-            });
+            const res = await axios.post(
+                'https://new-jfuz.onrender.com/api/v1/user/register',
+                input,
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                }
+            );
+
             if (res.data.success) {
-                navigate("/login");
                 toast.success(res.data.message);
-                setInput({
-                    username: "",
-                    email: "",
-                    password: ""
-                });
+                setInput({ username: "", email: "", password: "" });
+                navigate("/login");
             }
         } catch (error) {
-            console.log(error);
-            toast.error(error.response.data.message);
+            const msg = error?.response?.data?.message || "Signup failed";
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
-    }
+    };
 
-    useEffect(()=>{
-        if(user){
-            navigate("/");
-        }
-    },[])
+    useEffect(() => {
+        if (user) navigate("/");
+    }, [user, navigate]);
+
     return (
         <div className='flex items-center w-screen h-screen justify-center'>
-            <form onSubmit={signupHandler} className='shadow-lg flex flex-col gap-5 p-8'>
+            <form onSubmit={signupHandler} className='shadow-lg flex flex-col gap-5 p-8 w-80'>
                 <div className='my-4'>
                     <h1 className='text-center font-bold text-xl'>Insta-Fista</h1>
-                    <p className='text-sm text-center'>Signup to see photos & videos from your friends</p>
+                    <p className='text-sm text-center'>Sign up to see photos & videos from your friends</p>
                 </div>
+
                 <div>
                     <span className='font-medium'>Username</span>
                     <Input
@@ -68,8 +75,10 @@ const Signup = () => {
                         value={input.username}
                         onChange={changeEventHandler}
                         className="focus-visible:ring-transparent my-2"
+                        required
                     />
                 </div>
+
                 <div>
                     <span className='font-medium'>Email</span>
                     <Input
@@ -78,8 +87,10 @@ const Signup = () => {
                         value={input.email}
                         onChange={changeEventHandler}
                         className="focus-visible:ring-transparent my-2"
+                        required
                     />
                 </div>
+
                 <div>
                     <span className='font-medium'>Password</span>
                     <Input
@@ -88,22 +99,28 @@ const Signup = () => {
                         value={input.password}
                         onChange={changeEventHandler}
                         className="focus-visible:ring-transparent my-2"
+                        required
                     />
                 </div>
-                {
-                    loading ? (
-                        <Button>
+
+                <Button type='submit' disabled={loading}>
+                    {loading ? (
+                        <>
                             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                             Please wait
-                        </Button>
+                        </>
                     ) : (
-                        <Button type='submit'>Signup</Button>
-                    )
-                }
-                <span className='text-center'>Already have an account? <Link to="/login" className='text-blue-600'>Login</Link></span>
+                        "Signup"
+                    )}
+                </Button>
+
+                <span className='text-center'>
+                    Already have an account?{" "}
+                    <Link to="/login" className='text-blue-600'>Login</Link>
+                </span>
             </form>
         </div>
     )
 }
 
-export default Signup
+export default Signup;
